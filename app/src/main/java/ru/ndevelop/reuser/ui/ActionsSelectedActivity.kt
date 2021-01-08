@@ -16,6 +16,8 @@ import ru.ndevelop.reuser.adapters.OnStartDragListener
 import ru.ndevelop.reuser.adapters.SelectedActionsAdapter
 import ru.ndevelop.reuser.repositories.DataBaseHandler
 import ru.ndevelop.reuser.utils.Action
+import ru.ndevelop.reuser.utils.ActionTypes
+import ru.ndevelop.reuser.utils.Utils
 
 
 class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnStartDragListener {
@@ -26,7 +28,7 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
     private lateinit var btnOk:Button
     private lateinit var touchHelper: ItemTouchHelper
     private lateinit var fabActions:FloatingActionButton
-    var tagId = ""
+    private var tagId = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_actions_select)
@@ -35,7 +37,7 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
         initViews()
     }
 
-    fun initViews() {
+    private fun initViews() {
         addFirstActionButton = findViewById(R.id.btn_add_first_action)
         addFirstActionButton.setOnClickListener(this)
         llIfActionsNotSelected = findViewById(R.id.ll_ifEmpty)
@@ -69,7 +71,7 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
                     finish()
                 } else {
                     Toast.makeText(this, "Вы не выбрали ни одного действия!", Toast.LENGTH_SHORT)
-                        .show();
+                        .show()
                 }
 
             }
@@ -104,15 +106,23 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
     }*/
 
     override fun onStartDrag(viewHolder: RecyclerView.ViewHolder) {
-        touchHelper.startDrag(viewHolder);
+        touchHelper.startDrag(viewHolder)
     }
-    fun newActionDetected(action:Action){
-        when(action){
-            Action.SITE ->{
+    private fun newActionDetected(action:Action){
+        when(action.actionType){
+            ActionTypes.SITE ->{
                 openSiteEditTextDialog(action)
             }
-            Action.APPLICATION ->{
+            ActionTypes.APPLICATION ->{
                 openApplicationEditTextDialog(action)
+            }
+            ActionTypes.CAMERA -> {
+                if (Utils.checkCameraPermission(this))
+                    selectedActionsAdapter.addAction(action)
+                else {
+                    Toast.makeText(this, "Вы не разрешили доступ к камере :(", Toast.LENGTH_SHORT).show()
+                }
+
             }
             else ->{
                 selectedActionsAdapter.addAction(action)
@@ -121,10 +131,8 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
 
         llIfActionsNotSelected.visibility = View.GONE
     }
-    fun openSiteEditTextDialog(action: Action){
-        val taskEditText = EditText(this);
-        var resultUrl = ""
-        taskEditText.setText(DataBaseHandler.getTagName(tagId), TextView.BufferType.EDITABLE);
+    private fun openSiteEditTextDialog(action: Action){
+        val taskEditText = EditText(this)
         val dialog = AlertDialog.Builder(this)
             .setTitle("Введите адресс сайта")
             .setMessage("Какой сайт открыть?")
@@ -142,10 +150,8 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
             .create()
         dialog.show()
     }
-    fun openApplicationEditTextDialog(action: Action){
-        val taskEditText = EditText(this);
-        var resultUrl = ""
-        taskEditText.setText(DataBaseHandler.getTagName(tagId), TextView.BufferType.EDITABLE);
+    private fun openApplicationEditTextDialog(action: Action){
+        val taskEditText = EditText(this)
         val dialog = AlertDialog.Builder(this)
             .setTitle("Введите название пакета приложения")
             .setMessage("Например ru.ndevelop.reuser")

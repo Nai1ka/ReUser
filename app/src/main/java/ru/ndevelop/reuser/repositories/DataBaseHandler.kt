@@ -41,7 +41,7 @@ object DataBaseHandler : SQLiteOpenHelper(
 
         var actionsString = ""
         actions.forEachIndexed { index, action ->
-            actionsString += "${index}-${action.name}-${action.status.toInt()}-${action.specialData}~"
+            actionsString += "${index}-${action.actionType.name}-${action.status.toInt()}-${action.specialData}~"
 
         }
         contentValues.put(COL_ACTION, actionsString)
@@ -65,7 +65,7 @@ object DataBaseHandler : SQLiteOpenHelper(
     fun getTagActions(tag: String): ArrayList<Action> {
         val db = this.readableDatabase
         var resultActions = arrayListOf<Action>()
-        val query = "SELECT * FROM $TAGS_TABLENAME WHERE $COL_ID=?";
+        val query = "SELECT * FROM $TAGS_TABLENAME WHERE $COL_ID=?"
         val tempResult = db.rawQuery(query, arrayOf(tag))
         if (tempResult.count > 0) {
             tempResult.moveToFirst()
@@ -121,14 +121,14 @@ object DataBaseHandler : SQLiteOpenHelper(
         val db = this.writableDatabase
         val cv = ContentValues()
         cv.put(COL_NAME, newName) //These Fields should be your String values of actual column names
-        db.update(TAGS_TABLENAME, cv, "$COL_ID = ?", arrayOf(tagId));
+        db.update(TAGS_TABLENAME, cv, "$COL_ID = ?", arrayOf(tagId))
     }
     fun getTagName(tagId: String):String{
         val db = this.readableDatabase
         var result = ""
         try {
-            val query = "Select * from $TAGS_TABLENAME"
-            val tempResult = db.rawQuery(query, null)
+            val query = "SELECT * FROM $TAGS_TABLENAME WHERE $COL_ID=?"
+            val tempResult = db.rawQuery(query, arrayOf(tagId))
             if (tempResult.moveToFirst()) {
                 val tempResult = tempResult.getString(
                     tempResult.getColumnIndex(

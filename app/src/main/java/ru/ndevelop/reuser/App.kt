@@ -5,7 +5,6 @@
 
 package ru.ndevelop.reuser
 
-import android.app.Activity
 import android.content.Context
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication

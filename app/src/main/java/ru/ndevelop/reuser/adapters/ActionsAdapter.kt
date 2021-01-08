@@ -12,11 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import ru.ndevelop.reuser.R
 import ru.ndevelop.reuser.utils.Action
+import ru.ndevelop.reuser.utils.ActionTypes
+import ru.ndevelop.reuser.utils.Utils
 
 
-class ActionsAdapter(val context: Context, val clickListener: onActionClickListener) :
+class ActionsAdapter(val context: Context, val clickListener: OnActionClickListener) :
     RecyclerView.Adapter<ActionsAdapter.SingleViewHolder>() {
-    private var items: Array<Action> = Action.values()
+    private var items: ArrayList<Action> = Utils.getActionsList()
 
 
     inner class SingleViewHolder(convertView: View) : RecyclerView.ViewHolder(convertView),
@@ -26,12 +28,12 @@ class ActionsAdapter(val context: Context, val clickListener: onActionClickListe
         private val switch: SwitchMaterial = convertView.findViewById(R.id.switch_rv)
         private val ivAction: ImageView = convertView.findViewById(R.id.iv_action)
         fun bind(item: Action) {
-            tvActionName.text = item.actionName
-            llAction.tag = item.name
+            tvActionName.text = item.actionType.actionName
+            llAction.tag = item.actionType.name
             switch.isChecked = false
-            ivAction.setImageResource(item.icon)
+            ivAction.setImageResource(item.actionType.icon)
             llAction.setBackgroundResource(R.color.white)
-            if (item.isTwoStatuses) switch.visibility = View.VISIBLE
+            if (item.actionType.isTwoStatuses) switch.visibility = View.VISIBLE
             else switch.visibility = View.INVISIBLE
             switch.setOnClickListener(this)
             llAction.setOnClickListener(this)
@@ -41,9 +43,9 @@ class ActionsAdapter(val context: Context, val clickListener: onActionClickListe
             if (v != null) {
 
                 llAction.setBackgroundResource(R.color.lightGrey)
-                val tempAction = Action.valueOf(llAction.tag as String)
-                notifyItemRangeChanged(0, tempAction.ordinal)
-                notifyItemRangeChanged(tempAction.ordinal + 1,items.size)
+                val tempAction = Action(ActionTypes.valueOf(llAction.tag as String))
+                notifyItemRangeChanged(0, tempAction.actionType.ordinal)
+                notifyItemRangeChanged(tempAction.actionType.ordinal + 1,items.size)
 
                 tempAction.status = switch.isChecked
                 clickListener.onActionClicked(tempAction)
@@ -70,7 +72,7 @@ class ActionsAdapter(val context: Context, val clickListener: onActionClickListe
 
     }
 
-    interface onActionClickListener {
+    interface OnActionClickListener {
         fun onActionClicked(action: Action)
     }
 

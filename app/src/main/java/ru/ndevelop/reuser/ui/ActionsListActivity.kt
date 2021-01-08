@@ -11,11 +11,11 @@ import ru.ndevelop.reuser.adapters.ActionsAdapter
 import ru.ndevelop.reuser.utils.Action
 
 class ActionsListActivity : AppCompatActivity(), View.OnClickListener,
-    ActionsAdapter.onActionClickListener {
+    ActionsAdapter.OnActionClickListener {
     private lateinit var confirmButton: Button
     private lateinit var rvActions: RecyclerView
     private lateinit var actionsAdapter: ActionsAdapter
-    var selectedAction: Action? = null
+    private var selectedAction: Action? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_actions_list)
@@ -23,7 +23,7 @@ class ActionsListActivity : AppCompatActivity(), View.OnClickListener,
         initViews()
     }
 
-    fun initViews() {
+    private fun initViews() {
         confirmButton = findViewById(R.id.btn_action_confirm)
         confirmButton.setOnClickListener(this)
         rvActions = findViewById(R.id.rv_actions)
@@ -38,7 +38,7 @@ class ActionsListActivity : AppCompatActivity(), View.OnClickListener,
             confirmButton -> {
                 if ( selectedAction!=null) {
                     val intent = Intent()
-                    intent.putExtra("action", selectedAction)
+                    intent.putExtra("action", selectedAction!! )
                     setResult(RESULT_OK, intent)
                     finish()
                 }

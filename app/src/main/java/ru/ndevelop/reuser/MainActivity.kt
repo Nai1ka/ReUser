@@ -18,13 +18,15 @@ import ru.ndevelop.reuser.RequestCodes.nfcRequestCode
 import ru.ndevelop.reuser.repositories.DataBaseHandler
 import ru.ndevelop.reuser.ui.ActionsSelectedActivity
 import ru.ndevelop.reuser.utils.Action
+import ru.ndevelop.reuser.utils.ActionTypes
 import ru.ndevelop.reuser.utils.Utils
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var nfcAdapter : NfcAdapter? = null
+    private var nfcAdapter: NfcAdapter? = null
     var nfcSearchEnabled = false
+
     // Pending intent for NFC intent foreground dispatch.
     // Used to read all NDEF tags while the app is running in the foreground.
     private var nfcPendingIntent: PendingIntent? = null
@@ -32,39 +34,44 @@ class MainActivity : AppCompatActivity() {
     //private var nfcIntentFilters: Array<IntentFilter>? = null
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val registeredTag = Utils.ByteArrayToHexString(intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id)
+        val registeredTag =
+            Utils.byteArrayToHexString(intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id)
         val actions = DataBaseHandler.getTagActions(registeredTag)
 
 
-        if(actions.isNotEmpty()) {
-            actions.forEach{
-                when(it){
-                    Action.WIFI -> {
-                        val wifiManager =
-                            this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                        wifiManager.isWifiEnabled = false
-                    }
-                    Action.CAMERA -> openCamera()
-                    Action.FLASHLIGHT -> turnOnFlash()
-                    Action.SITE -> {
-                        val browserIntent =
-                            Intent(Intent.ACTION_VIEW, Uri.parse(it.specialData))
-                        startActivity(browserIntent)
-                    }
-                    Action.APPLICATION -> {
-                        val launchIntent =
-                            packageManager.getLaunchIntentForPackage(it.specialData)
-                        launchIntent?.let { intent -> startActivity(intent) }
+
+
+        if (actions.isNotEmpty()) {
+            try {
+                actions.forEach {
+                    when (it.actionType) {
+                        ActionTypes.WIFI -> {
+                            val wifiManager =
+                                this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                            wifiManager.isWifiEnabled = false
+                        }
+                        ActionTypes.CAMERA -> openCamera()
+                        ActionTypes.FLASHLIGHT -> turnOnFlash()
+                        ActionTypes.SITE -> {
+                            val browserIntent =
+                                Intent(Intent.ACTION_VIEW, Uri.parse(it.specialData))
+                            startActivity(browserIntent)
+                        }
+                        ActionTypes.APPLICATION -> {
+                            val launchIntent =
+                                packageManager.getLaunchIntentForPackage(it.specialData)
+                            launchIntent?.let { intent -> startActivity(intent) }
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
             }
             finish()
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_main)
             val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
@@ -78,35 +85,35 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-        }
+    }
 
     override fun onResume() {
         super.onResume()
-        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null);
+        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
     }
 
     override fun onPause() {
         super.onPause()
         if (nfcAdapter != null) {
-            nfcAdapter!!.disableForegroundDispatch(this);
+            nfcAdapter!!.disableForegroundDispatch(this)
         }
     }
 
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if(nfcSearchEnabled){
+        if (nfcSearchEnabled) {
             nfcSearchEnabled = false
 
             val resultByteArray = intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id
             //TODO проверить корректность метки(возможно)
-            val tagId = Utils.ByteArrayToHexString(resultByteArray)
-            if(DataBaseHandler.isTagAlreadyExist(tagId)){
+            val tagId = Utils.byteArrayToHexString(resultByteArray)
+            if (DataBaseHandler.isTagAlreadyExist(tagId)) {
                 Toast.makeText(
                     this,
                     "Такая метка уже существует. Информация будет перезаписана",
                     Toast.LENGTH_SHORT
-                ).show();
+                ).show()
             }
             val i = Intent(this, ActionsSelectedActivity::class.java)
             i.putExtra("tagId", tagId)
@@ -120,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         if (data == null) {
             return
         }
-        when(requestCode){
+        when (requestCode) {
             nfcRequestCode -> {
                 val tagId = data.getStringExtra("tagId") ?: "" //TODO тоже сделать проверку
                 val actions: ArrayList<Action> =
@@ -135,15 +142,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun openCamera(){
+    private fun openCamera() {
         val intent = Intent("android.media.action.IMAGE_CAPTURE")
         startActivity(intent)
     }
-fun turnOnFlash(){
-    val camera = Camera.open()
-    val parameters: Camera.Parameters = camera.parameters
-    parameters.flashMode = Camera.Parameters.FLASH_MODE_TORCH
-    camera.parameters = parameters
-    camera.startPreview()
-}
+
+    private fun turnOnFlash() {
+        val camera = Camera.open()
+        val parameters: Camera.Parameters = camera.parameters
+        parameters.flashMode = Camera.Parameters.FLASH_MODE_TORCH
+        camera.parameters = parameters
+        camera.startPreview()
+    }
 }

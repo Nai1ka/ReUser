@@ -1,7 +1,14 @@
 package ru.ndevelop.reuser.utils
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+
+
+
+
 object Utils {
-     fun ByteArrayToHexString(inarray: ByteArray?): String {
+     fun byteArrayToHexString(inarray: ByteArray?): String {
         var i: Int
         var `in`: Int
         val hex = arrayOf(
@@ -23,7 +30,7 @@ object Utils {
             "F"
         )
         var out = ""
-        var j: Int = 0
+        var j = 0
         if(inarray!=null)
             while (j < inarray.size) {
                 `in` = inarray[j].toInt() and 0xff
@@ -35,14 +42,14 @@ object Utils {
             }
         return out
     }
-    fun getActionsFromString(actionsString:String):ArrayList<Action>{
+    fun getActionsFromString(actionsString: String):ArrayList<Action>{
         val result:ArrayList<Action> = arrayListOf()
         var tempActions = actionsString.split('~')
-        tempActions = tempActions.subList(0,tempActions.size-1)
+        tempActions = tempActions.subList(0, tempActions.size - 1)
         tempActions.forEach{
             val tempAction = it.split('-')
             if(tempAction.size==4) {
-                val resultAction = Action.valueOf(tempAction[1])
+                val resultAction = Action(ActionTypes.valueOf(tempAction[1]))
                 resultAction.status = tempAction[2] == "1"
                 resultAction.specialData = tempAction[3]
                 result.add(resultAction)
@@ -50,6 +57,18 @@ object Utils {
             }
         }
         return result
+    }
+    fun getActionsList():ArrayList<Action>{
+        val resultArrayList:ArrayList<Action> = arrayListOf()
+        for(i in ActionTypes.values()){
+            resultArrayList.add(Action(i))
+        }
+        return resultArrayList
+    }
+     fun checkCameraPermission(context: Context): Boolean {
+        val permission = Manifest.permission.CAMERA
+        val res: Int = context.checkCallingOrSelfPermission(permission)
+        return res == PackageManager.PERMISSION_GRANTED
     }
 
 }

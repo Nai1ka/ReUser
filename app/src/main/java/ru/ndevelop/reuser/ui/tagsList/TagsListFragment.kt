@@ -8,18 +8,17 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import io.sulek.ssml.SSMLLinearLayoutManager
 import ru.ndevelop.reuser.R
 import ru.ndevelop.reuser.adapters.ButtonType
+import ru.ndevelop.reuser.adapters.OnEditButtonClickListener
 import ru.ndevelop.reuser.adapters.TagListAdapter
-import ru.ndevelop.reuser.adapters.onEditButtonClickListener
 import ru.ndevelop.reuser.repositories.DataBaseHandler
 
 
-class TagsListFragment : Fragment(), onEditButtonClickListener {
+class TagsListFragment : Fragment(), OnEditButtonClickListener {
 
     private lateinit var dashboardViewModel: DashboardViewModel
     private lateinit var recyclerView: RecyclerView
@@ -38,13 +37,13 @@ class TagsListFragment : Fragment(), onEditButtonClickListener {
         dashboardViewModel =
             ViewModelProvider(this).get(DashboardViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_taglist, container, false)
-        dashboardViewModel.text.observe(viewLifecycleOwner, Observer {
+        dashboardViewModel.text.observe(viewLifecycleOwner, {
         })
         initView(root)
         return root
     }
 
-    fun initView(r: View) {
+    private fun initView(r: View) {
         recyclerView = r.findViewById(R.id.rv_taglist)
         with(recyclerView) {
             adapter = tagListAdapter
@@ -53,9 +52,9 @@ class TagsListFragment : Fragment(), onEditButtonClickListener {
 
     }
 
-    fun showEditTextDialog(tagId: String) {
-        val taskEditText = EditText(requireContext());
-        taskEditText.setText(DataBaseHandler.getTagName(tagId), TextView.BufferType.EDITABLE);
+    private fun showEditTextDialog(tagId: String) {
+        val taskEditText = EditText(requireContext())
+        taskEditText.setText(DataBaseHandler.getTagName(tagId), TextView.BufferType.EDITABLE)
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Введите новое название")
             .setMessage("Как следует называть эту метку?")
@@ -70,7 +69,7 @@ class TagsListFragment : Fragment(), onEditButtonClickListener {
         dialog.show()
     }
 
-    fun showDeleteConfirmationDialog(tagId: String) {
+    private fun showDeleteConfirmationDialog(tagId: String) {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Вы уверены, что хотите удалить эту метку?")
             .setMessage("Это действие нельзя отменить")

@@ -1,6 +1,7 @@
 package ru.ndevelop.reuser.utils
 
 import ru.ndevelop.reuser.R
+import java.io.Serializable
 
 /*open class Action {
     open val name:String = "New Tag"
@@ -54,14 +55,17 @@ class Application : Action() {
     override var specialData: String = ""
      override val ordinal:Int = 5
 }*/
-
-enum class Action(val actionName:String,val isTwoStatuses:Boolean,var status:Boolean = false, var icon:Int, var specialData:String){ //status: true - включено false - выключено
-    CAMERA("Открыть камеру",false, icon = R.drawable.ic_baseline_camera_alt_24,specialData = ""),
-    FLASHLIGHT("Включить выключить фонарик",true, icon = R.drawable.ic_baseline_flash_on_24,specialData = ""),
-    SOUND("Включить/выключить звук",true, icon = R.drawable.ic_baseline_volume_up_24,specialData = ""),
-    WIFI("Включить/выключить WI-FI",true, icon = R.drawable.ic_baseline_wifi_24,specialData = ""),
-    SITE("Открыть сайт",false,icon = R.drawable.ic_baseline_open_in_browser_24,specialData = ""),
-    APPLICATION("Открыть приложение",false,icon = R.drawable.ic_baseline_smartphone_24,specialData = "")
+data class Action(val actionType:ActionTypes):Serializable{
+    var status:Boolean = false
+    var specialData:String = ""
+}
+enum class ActionTypes(val actionName:String,val isTwoStatuses:Boolean, val icon:Int ){ //status: true - включено false - выключено
+    CAMERA("Открыть камеру",false, icon = R.drawable.ic_baseline_camera_alt_24),
+    FLASHLIGHT("Включить выключить фонарик",true, icon = R.drawable.ic_baseline_flash_on_24),
+    SOUND("Включить/выключить звук",true, icon = R.drawable.ic_baseline_volume_up_24),
+    WIFI("Включить/выключить WI-FI",true, icon = R.drawable.ic_baseline_wifi_24),
+    SITE("Открыть сайт",false,icon = R.drawable.ic_baseline_open_in_browser_24),
+    APPLICATION("Открыть приложение",false,icon = R.drawable.ic_baseline_smartphone_24)
 }
 
 /*

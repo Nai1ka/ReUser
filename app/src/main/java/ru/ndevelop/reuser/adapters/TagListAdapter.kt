@@ -11,7 +11,7 @@ import io.sulek.ssml.SimpleSwipeMenuLayout
 import ru.ndevelop.reuser.R
 import ru.ndevelop.reuser.Tag
 
-class TagListAdapter(val editButtonClickListener: onEditButtonClickListener) :
+class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
     RecyclerView.Adapter<TagListAdapter.SingleViewHolder>() {
     private var items: ArrayList<Tag> = arrayListOf()
 
@@ -23,14 +23,14 @@ class TagListAdapter(val editButtonClickListener: onEditButtonClickListener) :
             convertView.findViewById(R.id.swipeContainer)
         private val editBtn: FrameLayout = convertView.findViewById(R.id.btn_edit)
         private val deleteBtn: FrameLayout = convertView.findViewById(R.id.btn_delete)
-        var tagId = ""
+        private var tagId = ""
 
 
         fun bind(item: Tag) {
             tvTagList.text = item.name
             tagId = item.tagId
             tvTagActions.text = ""
-            item.actions.forEach { tvTagActions.append("${it.actionName} ${it.specialData}\n") }
+            item.actions.forEach { tvTagActions.append("${it.actionType.actionName} ${it.specialData}\n") }
             editBtn.setOnClickListener(this)
             deleteBtn.setOnClickListener(this)
             swipeContainer.setOnSwipeListener(object : OnSwipeListener {
@@ -81,10 +81,10 @@ class TagListAdapter(val editButtonClickListener: onEditButtonClickListener) :
 
 }
 
-interface onEditButtonClickListener {
+interface OnEditButtonClickListener {
     fun onEditButtonClick(button: ButtonType, tagId: String)
 }
 
-enum class ButtonType() {
+enum class ButtonType {
     EDIT, DELETE
 }

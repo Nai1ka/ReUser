@@ -27,12 +27,12 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
         private val ivAction:ImageView = convertView.findViewById(R.id.iv_action)
         private val switch: SwitchMaterial = convertView.findViewById(R.id.switch_rv)
         fun bind(item: Action) {
-            tvActionName.text = item.actionName
-            llAction.tag = item.name
+            tvActionName.text = item.actionType.actionName
+            llAction.tag = item.actionType.name
             llAction.setOnTouchListener(this)
-            ivAction.setImageResource(item.icon)
+            ivAction.setImageResource(item.actionType.icon)
             switch.isClickable = false
-            if (item.isTwoStatuses) {
+            if (item.actionType.isTwoStatuses) {
                 switch.visibility = View.VISIBLE
                 switch.isChecked = item.status
             } else switch.visibility = View.INVISIBLE
@@ -43,7 +43,7 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
                 MotionEvent.ACTION_DOWN) {
                 mDragStartListener.onStartDrag(this)
             }
-            return false;
+            return false
         }
 
 
@@ -82,8 +82,8 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
     }
 
     override fun onItemDismiss(position: Int) {
-        items.removeAt(position);
-        notifyItemRemoved(position);
+        items.removeAt(position)
+        notifyItemRemoved(position)
     }
 fun getItems():ArrayList<Action> = items
 
