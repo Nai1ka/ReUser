@@ -7,18 +7,18 @@
     <fragment
         android:id="@+id/navigation_scan"
         android:name="ru.ndevelop.reuser.ui.scan.ScanFragment"
-        android:label="@string/title_home"
+        android:label="@string/title_scan"
         tools:layout="@layout/fragment_scan" />
 
     <fragment
         android:id="@+id/navigation_taglist"
         android:name="ru.ndevelop.reuser.ui.tagsList.TagsListFragment"
-        android:label="@string/title_dashboard"
+        android:label="@string/title_tag_list"
         tools:layout="@layout/fragment_taglist" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="ru.ndevelop.reuser.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_settings"
         tools:layout="@layout/fragment_notifications" />
 </navigation>
