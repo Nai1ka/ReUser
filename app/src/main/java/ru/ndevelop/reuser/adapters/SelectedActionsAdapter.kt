@@ -17,8 +17,7 @@ import ru.ndevelop.reuser.utils.Action
 import java.util.*
 import kotlin.collections.ArrayList
 
-
-class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
+class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener, private val onItemsStateListener: OnItemsStateListener) :
     RecyclerView.Adapter<SelectedActionsAdapter.SingleViewHolder>(), ItemTouchHelperAdapter {
     private var items: ArrayList<Action> = arrayListOf()
     inner class SingleViewHolder(convertView: View) : RecyclerView.ViewHolder(convertView), View.OnTouchListener{
@@ -45,8 +44,6 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
             }
             return false
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SingleViewHolder {
@@ -65,7 +62,9 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
     }
     fun addAction(action: Action){
         items.add(action)
+        onItemsStateListener.onItemAdded()
        notifyDataSetChanged()
+
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
@@ -83,12 +82,16 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener) :
 
     override fun onItemDismiss(position: Int) {
         items.removeAt(position)
+        onItemsStateListener.onItemDeleted(items.size)
         notifyItemRemoved(position)
     }
 fun getItems():ArrayList<Action> = items
-
 }
 interface OnStartDragListener {
-
     fun onStartDrag(viewHolder: RecyclerView.ViewHolder)
+}
+interface OnItemsStateListener{
+    fun onItemDeleted(currentItemsSize:Int)
+    fun onItemAdded()
+
 }

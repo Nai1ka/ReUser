@@ -19,7 +19,7 @@ import ru.ndevelop.reuser.utils.Utils
 class ActionsAdapter(val context: Context, val clickListener: OnActionClickListener) :
     RecyclerView.Adapter<ActionsAdapter.SingleViewHolder>() {
     private var items: ArrayList<Action> = Utils.getActionsList()
-
+    var lastClickPosition:Int = 0
 
     inner class SingleViewHolder(convertView: View) : RecyclerView.ViewHolder(convertView),
         View.OnClickListener {
@@ -44,8 +44,8 @@ class ActionsAdapter(val context: Context, val clickListener: OnActionClickListe
 
                 llAction.setBackgroundResource(R.color.lightGrey)
                 val tempAction = Action(ActionTypes.valueOf(llAction.tag as String))
-                notifyItemRangeChanged(0, tempAction.actionType.ordinal)
-                notifyItemRangeChanged(tempAction.actionType.ordinal + 1,items.size)
+                notifyItemChanged(lastClickPosition)
+                lastClickPosition = tempAction.actionType.ordinal
 
                 tempAction.status = switch.isChecked
                 clickListener.onActionClicked(tempAction)

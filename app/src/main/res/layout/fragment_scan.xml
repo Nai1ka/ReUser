@@ -6,39 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".ui.scan.ScanFragment">
 
-    <Button
-        android:id="@+id/scanButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Сканировать"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_start_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:text="Поднесите метку к телефону"
-        app:layout_constraintBottom_toTopOf="@+id/scanButton"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="invisible"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
+    <ImageButton
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_baseline_help_center_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <ImageView
         android:id="@+id/iv_nfc"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/scanButton"
+        android:src="@drawable/nfc_anim"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_start_scan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/nfc_anim"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

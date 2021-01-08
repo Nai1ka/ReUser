@@ -18,10 +18,9 @@ import ru.ndevelop.reuser.MainActivity
 import ru.ndevelop.reuser.R
 
 
-class ScanFragment : Fragment(),View.OnClickListener {
+class ScanFragment : Fragment(){
 
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var scanButton: Button
     private lateinit var mContext: Context
     private lateinit var infoText:TextView
     private lateinit var ivNFC:ImageView
@@ -45,8 +44,6 @@ class ScanFragment : Fragment(),View.OnClickListener {
 
     @SuppressLint("NewApi")
     fun initView(root: View){
-        scanButton = root.findViewById(R.id.scanButton)
-        scanButton.setOnClickListener(this)
         infoText = root.findViewById(R.id.tv_start_scan)
         ivNFC = root.findViewById(R.id.iv_nfc)
         d = ivNFC.drawable
@@ -56,28 +53,12 @@ class ScanFragment : Fragment(),View.OnClickListener {
                     (d as AnimatedVectorDrawable).start()
                 }
             })
-
+            (d as AnimatedVectorDrawable).start()
         }
 
     }
 
-    override fun onPause() {
-        super.onPause()
-        ivNFC.visibility = View.INVISIBLE
-        (d as AnimatedVectorDrawable).stop()
-        infoText.visibility = View.INVISIBLE
-    }
 
-    override fun onClick(v: View?) {
-        when(v){
-            scanButton -> {
-                infoText.visibility = View.VISIBLE
-                (requireActivity() as MainActivity).nfcSearchEnabled = true
-                ivNFC.visibility = View.VISIBLE
-                (d as AnimatedVectorDrawable).start()
-            }
-        }
-    }
 
 
 }

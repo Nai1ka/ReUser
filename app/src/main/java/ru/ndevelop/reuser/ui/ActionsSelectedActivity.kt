@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.ndevelop.reuser.R
 import ru.ndevelop.reuser.RequestCodes.actionsListRequestCode
 import ru.ndevelop.reuser.SimpleItemTouchHelperCallback
+import ru.ndevelop.reuser.adapters.OnItemsStateListener
 import ru.ndevelop.reuser.adapters.OnStartDragListener
 import ru.ndevelop.reuser.adapters.SelectedActionsAdapter
 import ru.ndevelop.reuser.repositories.DataBaseHandler
@@ -20,11 +22,11 @@ import ru.ndevelop.reuser.utils.ActionTypes
 import ru.ndevelop.reuser.utils.Utils
 
 
-class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnStartDragListener {
-    private lateinit var addFirstActionButton: Button
+class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnStartDragListener, OnItemsStateListener {
+/*    private lateinit var addFirstActionButton: Button*/
     private lateinit var rvSelectedActions: RecyclerView
     private lateinit var selectedActionsAdapter: SelectedActionsAdapter
-    private lateinit var llIfActionsNotSelected: LinearLayout
+    private lateinit var llIfActionsNotSelected: ConstraintLayout
     private lateinit var btnOk:Button
     private lateinit var touchHelper: ItemTouchHelper
     private lateinit var fabActions:FloatingActionButton
@@ -33,14 +35,15 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_actions_select)
         tagId = intent.getStringExtra("tagId") ?: ""
-        selectedActionsAdapter = SelectedActionsAdapter(this)
+        selectedActionsAdapter = SelectedActionsAdapter(this,this)
         initViews()
     }
 
     private fun initViews() {
-        addFirstActionButton = findViewById(R.id.btn_add_first_action)
-        addFirstActionButton.setOnClickListener(this)
+       /* addFirstActionButton = findViewById(R.id.btn_add_first_action)*/
+       /* addFirstActionButton.setOnClickListener(this)*/
         llIfActionsNotSelected = findViewById(R.id.ll_ifEmpty)
+        llIfActionsNotSelected.setOnClickListener(this)
         rvSelectedActions = findViewById(R.id.rv_selected_actions)
         btnOk = findViewById(R.id.btn_actions_selected)
         btnOk.setOnClickListener(this)
@@ -58,10 +61,14 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
 
     override fun onClick(v: View) {
         when (v) {
-            addFirstActionButton, fabActions -> {
+           /* addFirstActionButton, fabActions -> {
                 val i = Intent(this, ActionsListActivity::class.java)
                 startActivityForResult(i, actionsListRequestCode)
-            }
+            }*/
+                llIfActionsNotSelected,fabActions ->{
+                    val i = Intent(this, ActionsListActivity::class.java)
+                    startActivityForResult(i, actionsListRequestCode)
+                }
             btnOk -> {
                 if (selectedActionsAdapter.getItems().isNotEmpty()) {
                     val intent = Intent()
@@ -109,6 +116,7 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
         touchHelper.startDrag(viewHolder)
     }
     private fun newActionDetected(action:Action){
+
         when(action.actionType){
             ActionTypes.SITE ->{
                 openSiteEditTextDialog(action)
@@ -129,7 +137,6 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
             }
         }
 
-        llIfActionsNotSelected.visibility = View.GONE
     }
     private fun openSiteEditTextDialog(action: Action){
         val taskEditText = EditText(this)
@@ -163,6 +170,18 @@ class ActionsSelectedActivity : AppCompatActivity(), View.OnClickListener, OnSta
             .setNegativeButton("Отмена", null)
             .create()
         dialog.show()
+    }
+
+    override fun onItemDeleted(currentItemsSize: Int) {
+        if(currentItemsSize==0) {
+            btnOk.visibility = View.GONE
+            llIfActionsNotSelected.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onItemAdded() {
+        btnOk.visibility = View.VISIBLE
+        llIfActionsNotSelected.visibility = View.GONE
     }
 
 }

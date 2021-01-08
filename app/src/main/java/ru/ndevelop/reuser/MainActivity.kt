@@ -25,7 +25,6 @@ import ru.ndevelop.reuser.utils.Utils
 class MainActivity : AppCompatActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
-    var nfcSearchEnabled = false
 
     // Pending intent for NFC intent foreground dispatch.
     // Used to read all NDEF tags while the app is running in the foreground.
@@ -102,8 +101,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (nfcSearchEnabled) {
-            nfcSearchEnabled = false
 
             val resultByteArray = intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id
             //TODO проверить корректность метки(возможно)
@@ -118,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             val i = Intent(this, ActionsSelectedActivity::class.java)
             i.putExtra("tagId", tagId)
             startActivityForResult(i, nfcRequestCode)
-        }
+
 
     }
 
