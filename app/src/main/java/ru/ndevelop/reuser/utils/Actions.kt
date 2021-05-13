@@ -1,80 +1,84 @@
 package ru.ndevelop.reuser.utils
 
+
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.net.wifi.WifiManager
 import ru.ndevelop.reuser.R
 import java.io.Serializable
 
-/*open class Action {
-    open val name:String = "New Tag"
+
+
+data class Action(val actionType: ActionTypes) : Serializable {
     var status: Boolean = false
-    open val isTwoStatuses:Boolean = false
-    open var specialData = ""
-    open val icon:Int = 0
-    open val ordinal:Int = 0
+    var specialData: String = ""
+
 }
 
-class OpenCamera : Action() {
-    override val name: String = "Открыть камеру"
-    override val isTwoStatuses: Boolean = false
-    override val icon: Int = R.drawable.ic_baseline_camera_alt_24
-    override val ordinal:Int = 0
+interface Acting {
+    fun performAction(context: Context, status: Boolean = false, specialData: String = "")
 }
 
-class Flashlight : Action() {
-    override val name: String = "Включить выключить фонарик"
-    override val isTwoStatuses: Boolean = true
-   override  val icon: Int = R.drawable.ic_baseline_flash_on_24
-     override val ordinal:Int = 1
-}
+enum class ActionTypes(
+    val actionName: String,
+    val isTwoStatuses: Boolean,
+    val icon: Int,
+    var permissions: Array<String> = arrayOf()
+) : Acting { //status: true - включено false - выключено
+    CAMERA("Открыть камеру", false, icon = R.drawable.ic_baseline_camera_alt_24,permissions = arrayOf(Manifest.permission.CAMERA)) {
 
-class Sound : Action() {
-    override val name: String = "Включить/выключить звук"
-    override val isTwoStatuses: Boolean = true
-    override val icon: Int = R.drawable.ic_baseline_volume_up_24
-     override val ordinal:Int = 2
-}
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            val intent = Intent("android.media.action.IMAGE_CAPTURE")
+            context.startActivity(intent)
+        }
+    },
+    FLASHLIGHT("Фонарик", true, icon = R.drawable.ic_baseline_flash_on_24,permissions = arrayOf(Manifest.permission.CAMERA)) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            //TODO("Not yet implemented")
+        }
+    },
+    SOUND("Звук", true, icon = R.drawable.ic_baseline_volume_up_24) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+           // TODO("Not yet implemented")
+        }
+    },
+    WIFI("WI-FI", true, icon = R.drawable.ic_baseline_wifi_24,permissions = arrayOf(Manifest.permission.CHANGE_WIFI_STATE,Manifest.permission.ACCESS_WIFI_STATE)) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            val wifiManager =
+                context.applicationContext.getSystemService(
+                    Context.WIFI_SERVICE
+                ) as WifiManager
+            wifiManager.isWifiEnabled = status
+        }
+    },
+    BLUETOOTH("Bluetooth", true, icon = R.drawable.ic_baseline_bluetooth_24){
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            if (mBluetoothAdapter.isEnabled) {
+                mBluetoothAdapter.disable()
+            }
+        }
+    },
+    SITE("Открыть сайт", false, icon = R.drawable.ic_baseline_open_in_browser_24) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(specialData))
+            context.startActivity(browserIntent)
+        }
+    },
+    APPLICATION("Открыть приложение", false, icon = R.drawable.ic_baseline_smartphone_24) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            val launchIntent = context.packageManager.getLaunchIntentForPackage(specialData)
+            launchIntent?.let { intent -> context.startActivity(intent) }
+        }
+    },
+    DELAY("Подождать", false, icon = R.drawable.ic_baseline_timer_24) {
+        override fun performAction(context: Context, status: Boolean, specialData: String) {
+            Thread.sleep(specialData.toLong() * 1000)
+        }
+    }
 
-class Wifi : Action() {
-    override val name: String = "Включить/выключить WI-FI"
-    override val isTwoStatuses: Boolean = true
-    override val icon: Int = R.drawable.ic_baseline_wifi_24
-     override val ordinal:Int = 3
 }
-
-class Site : Action() {
-    override val name: String = "Открыть сайт"
-    override val isTwoStatuses: Boolean = false
-    override val icon: Int = R.drawable.ic_baseline_open_in_browser_24
-    override var specialData: String = ""
-     override val ordinal:Int = 4
-}
-
-class Application : Action() {
-    override val name: String = "Открыть приложение"
-    override val isTwoStatuses: Boolean = false
-    override val icon: Int = R.drawable.ic_baseline_smartphone_24
-    override var specialData: String = ""
-     override val ordinal:Int = 5
-}*/
-data class Action(val actionType:ActionTypes):Serializable{
-    var status:Boolean = false
-    var specialData:String = ""
-}
-enum class ActionTypes(val actionName:String,val isTwoStatuses:Boolean, val icon:Int ){ //status: true - включено false - выключено
-    CAMERA("Открыть камеру",false, icon = R.drawable.ic_baseline_camera_alt_24),
-    FLASHLIGHT("Включить выключить фонарик",true, icon = R.drawable.ic_baseline_flash_on_24),
-    SOUND("Включить/выключить звук",true, icon = R.drawable.ic_baseline_volume_up_24),
-    WIFI("Включить/выключить WI-FI",true, icon = R.drawable.ic_baseline_wifi_24),
-    SITE("Открыть сайт",false,icon = R.drawable.ic_baseline_open_in_browser_24),
-    APPLICATION("Открыть приложение",false,icon = R.drawable.ic_baseline_smartphone_24)
-}
-
-/*
-enum class ActionClasses(val actionClass:Action){
-    CAMERA(OpenCamera()),
-    FLASHLIGHT(Flashlight()),
-    SOUND(Sound()),
-    WIFI(Wifi()),
-    SITE(Site()),
-    APPLICATION(Application()),
-}
-*/

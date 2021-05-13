@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.switchmaterial.SwitchMaterial
-import ru.ndevelop.reuser.ItemTouchHelperAdapter
 import ru.ndevelop.reuser.R
+import ru.ndevelop.reuser.interfaces.ItemTouchHelperAdapter
 import ru.ndevelop.reuser.utils.Action
 import java.util.*
 import kotlin.collections.ArrayList
@@ -24,17 +24,17 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener, privat
         private val tvActionName: TextView = convertView.findViewById(R.id.tv_action_name)
         private val llAction: LinearLayout = convertView.findViewById(R.id.ll_actions)
         private val ivAction:ImageView = convertView.findViewById(R.id.iv_action)
-        private val switch: SwitchMaterial = convertView.findViewById(R.id.switch_rv)
+        private val toggleButton: ToggleButton = convertView.findViewById(R.id.toggle_button_rv)
         fun bind(item: Action) {
             tvActionName.text = item.actionType.actionName
             llAction.tag = item.actionType.name
             llAction.setOnTouchListener(this)
             ivAction.setImageResource(item.actionType.icon)
-            switch.isClickable = false
+            toggleButton.isClickable = false
             if (item.actionType.isTwoStatuses) {
-                switch.visibility = View.VISIBLE
-                switch.isChecked = item.status
-            } else switch.visibility = View.INVISIBLE
+                toggleButton.visibility = View.VISIBLE
+                toggleButton.isChecked = item.status
+            } else toggleButton.visibility = View.INVISIBLE
         }
 
         override fun onTouch(v: View?, event: MotionEvent?): Boolean {
@@ -66,7 +66,17 @@ class SelectedActionsAdapter(val mDragStartListener: OnStartDragListener, privat
        notifyDataSetChanged()
 
     }
+    fun loadActions(actions: ArrayList<Action>){
+        items = actions
+        onItemsStateListener.onItemAdded()
+        notifyDataSetChanged()
 
+    }
+    fun clear(){
+        items = arrayListOf()
+        onItemsStateListener.onItemDeleted(0)
+        notifyDataSetChanged()
+    }
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
         if (fromPosition < toPosition) {
             for (i in fromPosition until toPosition) {

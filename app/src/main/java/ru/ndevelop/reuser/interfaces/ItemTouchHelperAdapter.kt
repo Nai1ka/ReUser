@@ -1,4 +1,4 @@
-package ru.ndevelop.reuser
+package ru.ndevelop.reuser.interfaces
 
 interface ItemTouchHelperAdapter {
     fun onItemMove(fromPosition: Int, toPosition: Int)

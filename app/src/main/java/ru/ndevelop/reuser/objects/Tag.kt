@@ -1,4 +1,4 @@
-package ru.ndevelop.reuser
+package ru.ndevelop.reuser.objects
 
 import ru.ndevelop.reuser.utils.Action
 

@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import io.sulek.ssml.OnSwipeListener
 import io.sulek.ssml.SimpleSwipeMenuLayout
 import ru.ndevelop.reuser.R
-import ru.ndevelop.reuser.Tag
+import ru.ndevelop.reuser.objects.Tag
+import ru.ndevelop.reuser.utils.Action
+import ru.ndevelop.reuser.utils.ActionTypes
 
 class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
     RecyclerView.Adapter<TagListAdapter.SingleViewHolder>() {
@@ -30,7 +32,15 @@ class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
             tvTagList.text = item.name
             tagId = item.tagId
             tvTagActions.text = ""
-            item.actions.forEach { tvTagActions.append("${it.actionType.actionName} ${it.specialData}\n") }
+
+            item.actions.forEach {
+                var actionName = ""
+                if (it.actionType.isTwoStatuses)
+                    actionName = if (it.status) "Включить "
+                    else "Выключить "
+                actionName += if (it.actionType.isTwoStatuses && it.actionType!= ActionTypes.WIFI) it.actionType.actionName.decapitalize() else it.actionType.actionName
+                tvTagActions.append("$actionName ${it.specialData}\n")
+            }
             editBtn.setOnClickListener(this)
             deleteBtn.setOnClickListener(this)
             swipeContainer.setOnSwipeListener(object : OnSwipeListener {
@@ -50,12 +60,10 @@ class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
 
                     }
                     deleteBtn -> {
-                        editButtonClickListener.onEditButtonClick(ButtonType.DELETE,tagId)
+                        editButtonClickListener.onEditButtonClick(ButtonType.DELETE, tagId)
                     }
                 }
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SingleViewHolder {
@@ -64,9 +72,7 @@ class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
         return SingleViewHolder(convertView)
     }
 
-
     override fun getItemCount(): Int = items.size
-
 
     override fun onBindViewHolder(holder: SingleViewHolder, position: Int) {
         holder.bind(items[position])
@@ -77,8 +83,6 @@ class TagListAdapter(val editButtonClickListener: OnEditButtonClickListener) :
         items = payload
         notifyDataSetChanged()
     }
-
-
 }
 
 interface OnEditButtonClickListener {

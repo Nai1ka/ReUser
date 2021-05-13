@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import ru.ndevelop.reuser.R
@@ -25,17 +26,17 @@ class ActionsAdapter(val context: Context, val clickListener: OnActionClickListe
         View.OnClickListener {
         private val tvActionName: TextView = convertView.findViewById(R.id.tv_action_name)
         private val llAction: LinearLayout = convertView.findViewById(R.id.ll_actions)
-        private val switch: SwitchMaterial = convertView.findViewById(R.id.switch_rv)
+        private val toggleButton: ToggleButton = convertView.findViewById(R.id.toggle_button_rv)
         private val ivAction: ImageView = convertView.findViewById(R.id.iv_action)
         fun bind(item: Action) {
             tvActionName.text = item.actionType.actionName
             llAction.tag = item.actionType.name
-            switch.isChecked = false
+            toggleButton.isChecked = false
             ivAction.setImageResource(item.actionType.icon)
             llAction.setBackgroundResource(R.color.white)
-            if (item.actionType.isTwoStatuses) switch.visibility = View.VISIBLE
-            else switch.visibility = View.INVISIBLE
-            switch.setOnClickListener(this)
+            if (item.actionType.isTwoStatuses) toggleButton.visibility = View.VISIBLE
+            else toggleButton.visibility = View.INVISIBLE
+            toggleButton.setOnClickListener(this)
             llAction.setOnClickListener(this)
         }
 
@@ -44,10 +45,11 @@ class ActionsAdapter(val context: Context, val clickListener: OnActionClickListe
 
                 llAction.setBackgroundResource(R.color.lightGrey)
                 val tempAction = Action(ActionTypes.valueOf(llAction.tag as String))
-                notifyItemChanged(lastClickPosition)
+                if(tempAction.actionType.ordinal!=lastClickPosition)  notifyItemChanged(lastClickPosition)
+
                 lastClickPosition = tempAction.actionType.ordinal
 
-                tempAction.status = switch.isChecked
+                tempAction.status = toggleButton.isChecked
                 clickListener.onActionClicked(tempAction)
 
 

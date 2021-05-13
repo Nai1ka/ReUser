@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 
 import ru.ndevelop.reuser.App
-import ru.ndevelop.reuser.Tag
+import ru.ndevelop.reuser.objects.Tag
 import ru.ndevelop.reuser.utils.Action
 import ru.ndevelop.reuser.utils.Utils
 import ru.ndevelop.reuser.utils.toInt
@@ -33,7 +33,7 @@ object DataBaseHandler : SQLiteOpenHelper(
     }
 
 
-    fun updateIfExistsElseInsert(tagId: String, actions: ArrayList<Action>) {
+    fun updateIfExistsElseInsert(tagId: String,tagName:String, actions: ArrayList<Action>) {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         if (tagId == "") return
@@ -44,10 +44,10 @@ object DataBaseHandler : SQLiteOpenHelper(
             actionsString += "${index}-${action.actionType.name}-${action.status.toInt()}-${action.specialData}~"
 
         }
+        contentValues.put(COL_NAME, tagName)
         contentValues.put(COL_ACTION, actionsString)
         val rows = db.update(TAGS_TABLENAME, contentValues, "$COL_ID = ?", arrayOf(tagId))
         if (rows == 0) {
-            contentValues.put(COL_NAME, "New Tag")
             contentValues.put(COL_ID, tagId)
             db.insert(TAGS_TABLENAME, null, contentValues)
         }
@@ -130,11 +130,11 @@ object DataBaseHandler : SQLiteOpenHelper(
             val query = "SELECT * FROM $TAGS_TABLENAME WHERE $COL_ID=?"
             val tempResult = db.rawQuery(query, arrayOf(tagId))
             if (tempResult.moveToFirst()) {
-                val tempResult = tempResult.getString(
+                val mTempResult = tempResult.getString(
                     tempResult.getColumnIndex(
                         COL_NAME
                     ))
-               if(tempResult!="New Tag") result = tempResult
+               if(mTempResult!="New Tag") result = mTempResult
 
             }
             tempResult.close()

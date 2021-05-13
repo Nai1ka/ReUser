@@ -2,6 +2,7 @@ package ru.ndevelop.reuser.ui.scan
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
@@ -16,14 +17,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ru.ndevelop.reuser.MainActivity
 import ru.ndevelop.reuser.R
+import ru.ndevelop.reuser.ui.actionsList.ActionsListActivity
+import ru.ndevelop.reuser.ui.faqPage.FaqActivity
+
+import ru.ndevelop.reuser.utils.RequestCodes
 
 
-class ScanFragment : Fragment(){
+class ScanFragment : Fragment(), View.OnClickListener{
 
-    private lateinit var homeViewModel: HomeViewModel
+
     private lateinit var mContext: Context
     private lateinit var infoText:TextView
     private lateinit var ivNFC:ImageView
+    private lateinit var faqBtn:Button
     private lateinit var d: Drawable
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +40,7 @@ class ScanFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-                ViewModelProvider(this).get(HomeViewModel::class.java)
+
         val root = inflater.inflate(R.layout.fragment_scan, container, false)
         initView(root)
 
@@ -46,6 +51,8 @@ class ScanFragment : Fragment(){
     fun initView(root: View){
         infoText = root.findViewById(R.id.tv_start_scan)
         ivNFC = root.findViewById(R.id.iv_nfc)
+        faqBtn = root.findViewById(R.id.btn_faq)
+        faqBtn.setOnClickListener(this)
         d = ivNFC.drawable
         if (d is AnimatedVectorDrawable) {
             (d as AnimatedVectorDrawable).registerAnimationCallback(object : Animatable2.AnimationCallback() {
@@ -58,7 +65,14 @@ class ScanFragment : Fragment(){
 
     }
 
-
+    override fun onClick(v: View?) {
+        when(v){
+            faqBtn ->{
+                val i = Intent(requireContext(), FaqActivity::class.java)
+                startActivity(i)
+            }
+        }
+    }
 
 
 }

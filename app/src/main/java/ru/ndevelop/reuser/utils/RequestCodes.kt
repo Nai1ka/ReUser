@@ -1,4 +1,4 @@
-package ru.ndevelop.reuser
+package ru.ndevelop.reuser.utils
 
 object RequestCodes {
     const val nfcRequestCode = 1

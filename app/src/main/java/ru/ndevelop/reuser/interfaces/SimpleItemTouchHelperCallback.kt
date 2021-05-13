@@ -1,8 +1,9 @@
-package ru.ndevelop.reuser
+package ru.ndevelop.reuser.interfaces
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import ru.ndevelop.reuser.interfaces.ItemTouchHelperAdapter
 
 
 class SimpleItemTouchHelperCallback(private val mAdapter: ItemTouchHelperAdapter) :

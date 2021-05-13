@@ -1,24 +1,23 @@
 package ru.ndevelop.reuser
 
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.hardware.Camera
-import android.net.Uri
-import android.net.wifi.WifiManager
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import ru.ndevelop.reuser.RequestCodes.nfcRequestCode
+import ru.ndevelop.reuser.utils.RequestCodes.nfcRequestCode
 import ru.ndevelop.reuser.repositories.DataBaseHandler
-import ru.ndevelop.reuser.ui.ActionsSelectedActivity
+import ru.ndevelop.reuser.repositories.PreferencesRepository
+import ru.ndevelop.reuser.ui.actionsList.ActionsSelectedActivity
+import ru.ndevelop.reuser.ui.faqPage.FaqActivity
 import ru.ndevelop.reuser.utils.Action
-import ru.ndevelop.reuser.utils.ActionTypes
 import ru.ndevelop.reuser.utils.Utils
 
 
@@ -35,42 +34,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val registeredTag =
             Utils.byteArrayToHexString(intent?.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id)
         val actions = DataBaseHandler.getTagActions(registeredTag)
 
-
-
-
         if (actions.isNotEmpty()) {
             try {
                 actions.forEach {
-                    when (it.actionType) {
-                        ActionTypes.WIFI -> {
-                            val wifiManager =
-                                this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                            wifiManager.isWifiEnabled = false
-                        }
-                        ActionTypes.CAMERA -> openCamera()
-                        ActionTypes.FLASHLIGHT -> turnOnFlash()
-                        ActionTypes.SITE -> {
-                            val browserIntent =
-                                Intent(Intent.ACTION_VIEW, Uri.parse(it.specialData))
-                            startActivity(browserIntent)
-                        }
-                        ActionTypes.APPLICATION -> {
-                            val launchIntent =
-                                packageManager.getLaunchIntentForPackage(it.specialData)
-                            launchIntent?.let { intent -> startActivity(intent) }
-                        }
-                    }
+                    it.actionType.performAction(this,it.status,it.specialData)
+
                 }
             } catch (e: Exception) {
                 Toast.makeText(this, "$e", Toast.LENGTH_SHORT).show()
             }
             finish()
         } else {
+            if(PreferencesRepository.isFirstLaunch()){
+                val i = Intent(this, FaqActivity::class.java)
+                startActivity(i)
+                PreferencesRepository.setIsNotFirstLaunch()
+            }
             setContentView(R.layout.activity_main)
             val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
@@ -112,13 +95,15 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            val i = Intent(this, ActionsSelectedActivity::class.java)
-            i.putExtra("tagId", tagId)
-            startActivityForResult(i, nfcRequestCode)
+        startActionsSelectionActivity(tagId)
 
 
     }
-
+    fun startActionsSelectionActivity(tagId:String){
+        val i = Intent(this, ActionsSelectedActivity::class.java)
+        i.putExtra("tagId", tagId)
+        startActivityForResult(i, nfcRequestCode)
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data == null) {
@@ -127,10 +112,12 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             nfcRequestCode -> {
                 val tagId = data.getStringExtra("tagId") ?: "" //TODO тоже сделать проверку
+                val tagName = data.getStringExtra("tagName")?:"New Tag"
                 val actions: ArrayList<Action> =
                     (data.getSerializableExtra("actions")) as ArrayList<Action>
                 DataBaseHandler.updateIfExistsElseInsert(
                     tagId,
+                   tagName,
                     actions
                 )
             }

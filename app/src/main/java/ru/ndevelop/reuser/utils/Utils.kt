@@ -1,10 +1,10 @@
 package ru.ndevelop.reuser.utils
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
-
-
+import android.widget.EditText
 
 
 object Utils {
@@ -70,5 +70,6 @@ object Utils {
         val res: Int = context.checkCallingOrSelfPermission(permission)
         return res == PackageManager.PERMISSION_GRANTED
     }
+
 
 }
